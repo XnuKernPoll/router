@@ -1,0 +1,12 @@
+-module(membership).
+
+
+add_store_node(Index, Node) ->
+  {NP, Nodes} = ets:lookup(membership, "store_nodes"), 
+  Ring = {NP, lists:append({Index, Node}, Node) }
+  ets:insert(membership, {"store_nodes", Ring}),
+  {ok, Ring}. 
+
+rm_store_node(Index, Node) -> 
+  Ring = ets:lookup(membership, "store_nodes"),
+  
