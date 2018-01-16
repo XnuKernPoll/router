@@ -42,12 +42,18 @@ init_upload(URL, ID) ->
   hackney:send_multipart_body(Ref, {part, ID}),
   Ref. 
 
-
+send_delete(Replicas, Req) ->
+  URL = gen_uri(Host, Req),
+  hackney:delete(URL). 
+ 
 replication_proc() -> 
   receive 
     {replicate, Replicas, Req} -> 
       Refs = lists:map(fun (Host) -> init_upload(gen_uri(Host, Req), Replicas) end,  Replicas), 
       stream_to_replicas(Req, Refs),
-      replication_proc() 
+      replication_proc();
+    {delete, Replicas, Req} -> 
+      send_delete(Replicas, Req),
+      replication_proc()
   end.
   

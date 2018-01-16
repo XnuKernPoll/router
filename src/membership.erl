@@ -47,3 +47,4 @@ rm_router_node(ID) ->
   ets:insert(membership, {"router_nodes", Peers0}),
   {ok, Peers0}. 
 
+
