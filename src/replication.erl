@@ -1,14 +1,16 @@
 -module(replication).
--export([replication_proc/0, get_replica_list/2]).
+-export([replication_proc/0, get_replica_list/2, gen_uri/2]).
 
 term_fun(Node) -> 
   {_, T} = Node,
   T. 
 
+-spec gen_uri(string(), cowboy_req:req()) -> binary(). 
 gen_uri(Host, Req) -> 
   Base = list_to_binary(Host), 
   hackney_url:make_url(Base, cowboy_req:path(Req), cowboy_req:qs(Req)).  
-  
+
+-spec get_replica_list(chash:chash(), binary()) -> [term()]. 
 get_replica_list(Ring, ID) -> 
   F = application:get_env(replica_factor),  
   Replicas0 = chash:successors(ID, Ring, F), 
@@ -26,7 +28,7 @@ last_part(Ref, Body) ->
 % maybe I should make the foreach over the Ref lists parallel with spawn in stream_to_replicas% 
 stream_to_replicas(Req0, Refs) ->
   case cowboy_req:read_part_body(Req0) of 
-    {ok, _LastBodyChunk, Req} ->
+    {ok, _LastBodyChunk, _} ->
       lists:foreach(fun (Ref) -> last_part(Ref, _LastBodyChunk) end, Refs), 
       ok;
     {more, _Body, Req} ->
