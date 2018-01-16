@@ -1,7 +1,7 @@
 router
 =====
 
-An OTP application
+A routing system for a distributed content addressed file system
 
 Build
 -----
